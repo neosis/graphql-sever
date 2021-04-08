@@ -4,8 +4,70 @@ import {ApolloServer} from "apollo-server";
 
 const typeDefs = `
 type Organization {
-    hasPermId: String
-    headquartersAddress: String
+    name: String
+    address: Address @relation(name: "HASADDRESS", direction: OUT)
+    loans: [Loan] @relation(name:"HASLOAN", direction: OUT)
+    rm: Person @relation(name: "MANAGEDBY", direction: OUT)
+    currencyLimits: [HasCurrencyLimit]
+    clg: CustomerLendingGroup @relation(name: "ISMEMBEROF", direction: OUT)
+    persons: [Person] @relation(name:"HOLDSPOSITIONIN", direction: IN)
+}
+
+type Address {
+    address: String
+    city: String
+    country: String
+    lat: Float
+    long: Float
+}
+
+type Loan {
+    name: String
+    baseAmt: Float
+    amount: Float
+    currency: Currency @relation(name:"ISINCURRENCY", direction: OUT)
+    product: LoanProduct @relation(name:"ISOFPRODUCT", direction: OUT)
+    industry: Industry @relation(name:"ASSIGNEDTOINDUSTRY", direction: OUT)
+    org: Organization @relation(name:"HASLOAN", direction: IN)
+}
+
+type Person {
+    name: String
+    firstName: String
+    lastName: String
+}
+
+type Currency {
+    name: String,
+    loans: [Loan] @relation(name:"ISINCURRENCY", direction: IN)
+}
+type HasCurrencyLimit @relation(name: "HASCURRENCYLIMIT") {
+    from: Organization
+    to: Currency
+    value: Float
+ }
+ 
+ type LoanProduct {
+    name: String
+    loans: Loan @relation(name:"ISOFPRODUCT", direction: IN)
+}
+
+type Industry {
+    name: String
+    industryGroup: IndustryGroup @relation(name:"HASINDUSTRY", direction: IN)
+}
+
+type IndustryGroup {
+    name: String
+    sector: Sector @relation(name:"HASINDUSTRYGROUP", direction: IN)
+}
+
+type Sector {
+    name: String
+}
+
+type CustomerLendingGroup {
+    name: String
 }
 `;
 
@@ -31,3 +93,10 @@ server
   .then(({ url }) => {
     console.log(`GraphQL API ready at ${url}`);
   });
+
+
+// type Loan {
+//   durationInMonths: Float
+//   baseAmt: Float
+//   startDate: String
+// }
