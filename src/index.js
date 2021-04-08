@@ -55,15 +55,18 @@ type HasCurrencyLimit @relation(name: "HASCURRENCYLIMIT") {
 type Industry {
     name: String
     industryGroup: IndustryGroup @relation(name:"HASINDUSTRY", direction: IN)
+    children: [Loan]  @relation(name:"ASSIGNEDTOINDUSTRY", direction: IN)
 }
 
 type IndustryGroup {
     name: String
     sector: Sector @relation(name:"HASINDUSTRYGROUP", direction: IN)
+    children: [Industry] @relation(name:"HASINDUSTRY", direction: OUT)
 }
 
 type Sector {
     name: String
+    children: [IndustryGroup] @relation(name:"HASINDUSTRYGROUP", direction: OUT)
 }
 
 type CustomerLendingGroup {
